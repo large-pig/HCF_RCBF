@@ -1,0 +1,26 @@
+# Build products and Python caches
+.build/
+build/
+devel/
+install/
+__pycache__/
+*.py[cod]
+*.o
+*.so
+*.a
+
+# ROS recordings, diagnostics and local trial outputs
+*.bag
+*.bag.active
+*.db3
+*.log
+*.csv
+*.ros/
+.ros/
+ros.log
+trial_data/
+
+# Editor and system files
+.vscode/
+.idea/
+.DS_Store

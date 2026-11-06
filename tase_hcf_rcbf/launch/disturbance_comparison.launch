@@ -1,0 +1,75 @@
+<launch>
+  <arg name="enable_hardware" default="false" />
+  <arg name="robot_ip" />
+  <arg name="mode" />
+  <arg name="waveform" />
+  <arg name="base_budget" />
+  <arg name="tuning_file" />
+  <arg name="trial_id" />
+  <arg name="bag_prefix" />
+
+  <!-- 先读取公共机器人/任务参数，再用 HCF 或 RCBF 最终配置覆盖相应控制增益。 -->
+  <rosparam file="$(find tase_hcf_rcbf)/config/controller.yaml" command="load" />
+  <rosparam file="$(arg tuning_file)" command="load" />
+
+  <param name="tase_comparison/enable_hardware" value="$(arg enable_hardware)" type="bool" />
+  <param name="tase_comparison/mode" value="$(arg mode)" type="str" />
+  <param name="tase_comparison/trial_id" value="$(arg trial_id)" type="str" />
+  <param name="tase_comparison/hold_only" value="false" type="bool" />
+  <param name="tase_comparison/run_duration" value="50.0" type="double" />
+
+  <!-- 六组实验使用相同的参考轨迹及动态上下安全边界。 -->
+  <param name="tase_comparison/reference/offset" value="0.0" type="double" />
+  <param name="tase_comparison/reference/amplitude" value="1.0" type="double" />
+  <param name="tase_comparison/reference/omega" value="0.5" type="double" />
+  <param name="tase_comparison/reference/ramp_s" value="5.0" type="double" />
+
+  <param name="tase_comparison/lower/offset" value="-0.5" type="double" />
+  <param name="tase_comparison/lower/amplitude" value="0.4" type="double" />
+  <param name="tase_comparison/lower/omega" value="0.5" type="double" />
+  <param name="tase_comparison/upper/offset" value="0.6" type="double" />
+  <param name="tase_comparison/upper/amplitude" value="0.1" type="double" />
+  <param name="tase_comparison/upper/omega" value="1.0" type="double" />
+
+  <!-- 最终实验的软件加速度注入幅值固定为 2 rad/s²。 -->
+  <param name="tase_comparison/injection/enabled" value="true" type="bool" />
+  <param name="tase_comparison/injection/profile" value="sine" type="str" />
+  <param name="tase_comparison/injection/units" value="acceleration" type="str" />
+  <param name="tase_comparison/injection/amplitude" value="2.0" type="double" />
+  <param name="tase_comparison/injection/omega" value="0.5" type="double" />
+  <param name="tase_comparison/injection/scale" value="1.0" type="double" />
+  <param name="tase_comparison/injection/ramp_s" value="5.0" type="double" />
+  <param name="tase_comparison/residual_accel_bound" value="$(arg base_budget)" type="double" />
+  <param name="tase_comparison/d1_injection_only_budget" value="false" type="bool" />
+  <param name="tase_comparison/injection_comparison_waveform" value="$(arg waveform)" type="str" />
+
+  <!-- 启动状态检查和其余关节共用的位置保持控制参数。 -->
+  <param name="tase_comparison/commissioning/enabled" value="true" type="bool" />
+  <param name="tase_comparison/commissioning/controlled_joint_excursion_enabled" value="false" type="bool" />
+  <param name="tase_comparison/commissioning/controlled_joint_speed_enabled" value="false" type="bool" />
+  <param name="tase_comparison/commissioning/allow_controlled_injection" value="true" type="bool" />
+  <param name="tase_comparison/commissioning/initial_position_tolerance" value="0.02" type="double" />
+  <param name="tase_comparison/commissioning/initial_speed" value="0.02" type="double" />
+  <param name="tase_comparison/commissioning/excursion" value="0.20" type="double" />
+  <param name="tase_comparison/commissioning/max_speed" value="0.20" type="double" />
+  <param name="tase_comparison/commissioning/other_joint_drift" value="0.04" type="double" />
+  <param name="tase_comparison/velocity_bias/enabled" value="false" type="bool" />
+  <param name="tase_comparison/certificate/enforce" value="false" type="bool" />
+  <param name="tase_comparison/hold_kp" value="40.0" type="double" />
+  <param name="tase_comparison/hold_kd" value="8.0" type="double" />
+
+  <!-- 各关节期望力矩幅值及变化率限制。 -->
+  <rosparam param="tase_comparison/torque_limits">[87, 87, 87, 87, 12, 12, 12]</rosparam>
+  <rosparam param="tase_comparison/torque_rates">[999.999, 999.999, 999.999, 999.999, 999.999, 999.999, 999.999]</rosparam>
+
+  <group if="$(arg enable_hardware)">
+    <include file="$(find franka_control)/launch/franka_control.launch">
+      <arg name="robot_ip" value="$(arg robot_ip)" />
+      <arg name="load_gripper" value="false" />
+    </include>
+
+    <!-- 录制控制采样、最终配置及 Franka 实际状态，供离线分析与复现。 -->
+    <node name="tase_record" pkg="rosbag" type="record" output="screen"
+          args="-O $(arg bag_prefix) /tase_comparison/sample /tase_comparison/configuration /franka_state_controller/franka_states" />
+  </group>
+</launch>

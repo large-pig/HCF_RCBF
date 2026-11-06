@@ -1,0 +1,25 @@
+# 最终 RCBF 参数：k1=k2=50；启动脚本设置 B=28+2=30 rad/s²。
+tase_comparison:
+  ke: 1.0
+  eta1: 5.0
+  eta2: 100.0
+  p1: 7.0
+  p2: 10.0
+  tau_filter: 0.001
+  rho: 0.1
+  observer_gain: 10.0
+  # 名义加速度跟踪增益；其他关节保持控制仍使用 40/8。
+  kp: 1600.0
+  kd: 320.0
+  rcbf_k1: 50.0
+  rcbf_k2: 50.0
+  shared_compensation:
+    enabled: true
+    offset_nm: 0.1256390057
+    coulomb_nm: 1.1509920922
+    viscous_nms: 0.0
+    velocity_scale: 0.003
+    scale: 0.1
+    ramp_s: 5.0
+    cap_nm: 0.15
+    rate_nm_s: 1.0

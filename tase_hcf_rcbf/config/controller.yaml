@@ -1,0 +1,55 @@
+tase_comparison:
+  type: tase_hcf_rcbf/JointComparisonController
+  arm_id: panda
+  controlled_joint_index: 4
+  enable_hardware: false
+  hold_only: true
+  mode: HCF
+  trial_id: unset
+  run_duration: 50.0
+  max_dt: 0.01
+  torque_limits: [87.0, 87.0, 87.0, 87.0, 12.0, 12.0, 12.0]
+  torque_rates: [999.999, 999.999, 999.999, 999.999, 999.999, 999.999, 999.999]
+  hold_kp: 20.0
+  hold_kd: 4.0
+  # 采用统一名义轨迹；期望位置可能越过动态边界，以检验安全控制响应。
+  reference: {offset: 0.0, amplitude: 1.0, omega: 0.5}
+  lower: {offset: -0.5, amplitude: 0.4, omega: 0.5}
+  upper: {offset: 0.6, amplitude: 0.1, omega: 1.0}
+  ke: 1.0
+  eta1: 5.0
+  eta2: 100.0
+  p1: 1.0
+  p2: 1.0
+  tau_filter: 0.001
+  rho: 0.1
+  observer_gain: 10.0
+  kp: 100.0
+  kd: 20.0
+  rcbf_k1: 10.0
+  rcbf_k2: 10.0
+  # 剩余加速度扰动预算（rad/s²），不包含显式注入；-1 表示尚未指定。
+  # RCBF 不允许直接使用 -1；不能为启动实验而擅自设为零。
+  residual_accel_bound: -1.0
+  # 等效惯量下界（kg·m²），仅当力矩域注入需要转换扰动界时使用。
+  mass_min_for_torque_bound: -1.0
+  # 公共补偿对 HCF、RCBF 使用相同配置；默认值为零，
+  # 启用新的标定系数后，应重新评估剩余扰动预算。
+  friction: {coulomb_nm: 0.0, viscous_nms: 0.0, smooth_velocity: 0.02}
+  injection:
+    enabled: false
+    profile: case1
+    units: acceleration
+    amplitude: 0.0
+    omega: 1.0
+    scale: 1.0
+    ramp_s: 2.0
+  # 速度观测偏差是测量通道实验项，不代表真实外力。
+  velocity_bias: {enabled: false, amplitude: 0.02, omega: 1.0, ramp_s: 2.0}
+  certificate:
+    enforce: false
+    R: -1.0
+    nu: 0.01
+    L1: -1.0
+    K1: -1.0
+    P2: -1.0

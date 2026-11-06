@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<library path="lib/libtase_hcf_rcbf_controller">
+ <class name="tase_hcf_rcbf/JointComparisonController" type="tase_hcf_rcbf::JointComparisonController" base_class_type="controller_interface::ControllerBase">
+  <description>Common Franka platform with HCF or robust second-order CBF.</description>
+ </class>
+</library>

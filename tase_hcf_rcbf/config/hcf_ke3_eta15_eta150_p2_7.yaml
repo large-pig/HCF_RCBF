@@ -1,0 +1,24 @@
+# 六组实机对比实验使用的最终 HCF 参数。
+tase_comparison:
+  ke: 3.0
+  eta1: 15.0
+  eta2: 150.0
+  p1: 7.0
+  p2: 7.0
+  tau_filter: 0.001
+  rho: 0.1
+  observer_gain: 10.0
+  kp: 1600.0
+  kd: 320.0
+  rcbf_k1: 30.0
+  rcbf_k2: 30.0
+  shared_compensation:
+    enabled: true
+    offset_nm: 0.1256390057
+    coulomb_nm: 1.1509920922
+    viscous_nms: 0.0
+    velocity_scale: 0.003
+    scale: 0.1
+    ramp_s: 5.0
+    cap_nm: 0.15
+    rate_nm_s: 1.0
